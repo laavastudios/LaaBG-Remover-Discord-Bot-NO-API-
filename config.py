@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from dotenv import load_dotenv
 
@@ -29,7 +29,7 @@ def env_bool(name: str, default: bool) -> bool:
     raise RuntimeError(f"{name} must be true/false, got {raw!r}")
 
 
-@dataclass(frozen=True)
+@dataclass
 class Settings:
     token: str
     bot_name: str
@@ -40,12 +40,14 @@ class Settings:
     project_github: str
     owner_discord_id: int | None
 
+    # rembg local ONNX model.
+    # birefnet-general is the quality-oriented general model.
+    # birefnet-general-lite is lighter/faster.
+    # birefnet-portrait is intended for portraits.
     model: str
+    rembg_home: str
     alpha_matting: bool
-    alpha_foreground_threshold: int
-    alpha_background_threshold: int
-    alpha_erode_size: int
-    alpha_base_size: int
+    decontaminate: bool
 
     max_image_mb: int
     max_image_pixels: int
@@ -62,6 +64,12 @@ class Settings:
     emoji_github: str
     emoji_website: str
     emoji_heart: str
+    emoji_ping: str
+    emoji_info: str
+    emoji_help: str
+    emoji_sparkle: str
+
+    application_emojis: list = field(default_factory=list)
 
 
 def load_settings() -> Settings:
@@ -74,10 +82,34 @@ def load_settings() -> Settings:
     owner_id_raw = env_str("OWNER_DISCORD_ID")
     owner_id = int(owner_id_raw) if owner_id_raw else None
 
+    model = env_str("BG_MODEL", "birefnet-general")
+    allowed_models = {
+        "birefnet-general",
+        "birefnet-general-lite",
+        "birefnet-portrait",
+        "u2net",
+        "u2netp",
+        "u2net_human_seg",
+        "isnet-general-use",
+        "isnet-anime",
+    }
+    if model not in allowed_models:
+        raise RuntimeError(
+            f"Unsupported BG_MODEL={model!r}. Choose one of: "
+            + ", ".join(sorted(allowed_models))
+        )
+
+    max_mb = env_int("MAX_IMAGE_MB", 20)
+    max_pixels = env_int("MAX_IMAGE_PIXELS", 25_000_000)
+    if max_mb < 1 or max_mb > 25:
+        raise RuntimeError("MAX_IMAGE_MB must be between 1 and 25.")
+    if max_pixels < 100_000:
+        raise RuntimeError("MAX_IMAGE_PIXELS is unrealistically small.")
+
     return Settings(
         token=token,
         bot_name=env_str("BOT_NAME", "LaaBG Remover"),
-        bot_version=env_str("BOT_VERSION", "1.0.0"),
+        bot_version=env_str("BOT_VERSION", "2.0.0"),
         owner_name=env_str("OWNER_NAME", "LaavaBee"),
         owner_github=env_str("OWNER_GITHUB", "https://github.com/laavastudios"),
         owner_website=env_str("OWNER_WEBSITE", "https://laavastudios.live"),
@@ -86,16 +118,14 @@ def load_settings() -> Settings:
             "https://github.com/laavastudios/LaaBG-Remover-Discord-Bot-NO-API-",
         ),
         owner_discord_id=owner_id,
-        model=env_str("BG_MODEL", "u2net"),
-        alpha_matting=env_bool("BG_ALPHA_MATTING", True),
-        alpha_foreground_threshold=env_int("BG_ALPHA_FOREGROUND_THRESHOLD", 240),
-        alpha_background_threshold=env_int("BG_ALPHA_BACKGROUND_THRESHOLD", 10),
-        alpha_erode_size=env_int("BG_ALPHA_ERODE_SIZE", 10),
-        alpha_base_size=env_int("BG_ALPHA_BASE_SIZE", 1000),
-        max_image_mb=env_int("MAX_IMAGE_MB", 20),
-        max_image_pixels=env_int("MAX_IMAGE_PIXELS", 25_000_000),
+        model=model,
+        rembg_home=env_str("REMBG_HOME", "./models"),
+        alpha_matting=env_bool("BG_ALPHA_MATTING", False),
+        decontaminate=env_bool("BG_DECONTAMINATE", True),
+        max_image_mb=max_mb,
+        max_image_pixels=max_pixels,
         upload_timeout_seconds=env_int("UPLOAD_TIMEOUT_SECONDS", 120),
-        process_timeout_seconds=env_int("PROCESS_TIMEOUT_SECONDS", 180),
+        process_timeout_seconds=env_int("PROCESS_TIMEOUT_SECONDS", 300),
         accent_color=env_int("ACCENT_COLOR", 0x7C3AED),
         emoji_brand=env_str("EMOJI_BRAND", "✨"),
         emoji_success=env_str("EMOJI_SUCCESS", "✅"),
@@ -105,4 +135,8 @@ def load_settings() -> Settings:
         emoji_github=env_str("EMOJI_GITHUB", "🐙"),
         emoji_website=env_str("EMOJI_WEBSITE", "🌐"),
         emoji_heart=env_str("EMOJI_HEART", "❤️"),
+        emoji_ping=env_str("EMOJI_PING", "🏓"),
+        emoji_info=env_str("EMOJI_INFO", "ℹ️"),
+        emoji_help=env_str("EMOJI_HELP", "❓"),
+        emoji_sparkle=env_str("EMOJI_SPARKLE", "✨"),
     )
