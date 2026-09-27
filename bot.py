@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from config import Settings, load_settings
 from remover import ImageProcessingError, remove_background
-from ui import about_view, help_view, result_view, status_view
+from ui import EmojiPack, about_view, help_view, result_view, status_view
 
 logging.basicConfig(
     level=logging.INFO,
@@ -103,7 +103,7 @@ async def ping_command(ctx):
         ctx.channel,
         status_view(
             settings,
-            f"{getattr(settings, 'emoji_ping', '🏓')} Pong — {latency_ms} ms",
+            f"{EmojiPack(settings, ctx.guild).ping} Pong — {latency_ms} ms",
             "WebSocket latency measured successfully.",
             ctx.guild,
         ),
@@ -117,7 +117,7 @@ async def bgremove_command(ctx):
         ctx.channel,
         status_view(
             settings,
-            f"{getattr(settings, 'emoji_image', '🖼️')} Upload an image",
+            f"{EmojiPack(settings, ctx.guild).image} Upload an image",
             "Send one image in this channel within "
             f"{settings.upload_timeout_seconds} seconds.\n\n"
             f"Maximum size: {settings.max_image_mb} MB.",
@@ -143,7 +143,7 @@ async def bgremove_command(ctx):
             ctx.channel,
             status_view(
                 settings,
-                f"{getattr(settings, 'emoji_error', '❌')} Timed out",
+                f"{EmojiPack(settings, ctx.guild).error} Timed out",
                 "No image was uploaded. Run .bgremove again.",
                 ctx.guild,
             ),
@@ -160,7 +160,7 @@ async def bgremove_command(ctx):
             ctx.channel,
             status_view(
                 settings,
-                f"{getattr(settings, 'emoji_error', '❌')} Not an image",
+                f"{EmojiPack(settings, ctx.guild).error} Not an image",
                 "Please upload a valid image and run .bgremove again.",
                 ctx.guild,
             ),
@@ -171,7 +171,7 @@ async def bgremove_command(ctx):
         ctx.channel,
         status_view(
             settings,
-            f"{getattr(settings, 'emoji_loading', '⏳')} Processing",
+            f"{EmojiPack(settings, ctx.guild).loading} Processing",
             "Running local background removal. The first run may be slower "
             "while the model is prepared.",
             ctx.guild,
@@ -199,7 +199,7 @@ async def bgremove_command(ctx):
             ctx.channel,
             status_view(
                 settings,
-                f"{getattr(settings, 'emoji_error', '❌')} Could not process image",
+                f"{EmojiPack(settings, ctx.guild).error} Could not process image",
                 str(exc),
                 ctx.guild,
             ),
@@ -210,7 +210,7 @@ async def bgremove_command(ctx):
             ctx.channel,
             status_view(
                 settings,
-                f"{getattr(settings, 'emoji_error', '❌')} Unexpected error",
+                f"{EmojiPack(settings, ctx.guild).error} Unexpected error",
                 "Something went wrong. Check the bot console for details.",
                 ctx.guild,
             ),
@@ -224,7 +224,7 @@ async def bgremove_error(ctx, error):
             ctx.channel,
             status_view(
                 settings,
-                f"{getattr(settings, 'emoji_error', '❌')} Slow down",
+                f"{EmojiPack(settings, ctx.guild).error} Slow down",
                 f"Try .bgremove again in {error.retry_after:.1f}s.",
                 ctx.guild,
             ),
