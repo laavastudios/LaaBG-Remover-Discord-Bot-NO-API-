@@ -51,6 +51,7 @@ class Settings:
 
     max_image_mb: int
     max_image_pixels: int
+    max_output_mb: int
     upload_timeout_seconds: int
     process_timeout_seconds: int
 
@@ -101,10 +102,13 @@ def load_settings() -> Settings:
 
     max_mb = env_int("MAX_IMAGE_MB", 20)
     max_pixels = env_int("MAX_IMAGE_PIXELS", 25_000_000)
+    max_output_mb = env_int("MAX_OUTPUT_MB", 24)
     if max_mb < 1 or max_mb > 25:
         raise RuntimeError("MAX_IMAGE_MB must be between 1 and 25.")
     if max_pixels < 100_000:
         raise RuntimeError("MAX_IMAGE_PIXELS is unrealistically small.")
+    if max_output_mb < 1 or max_output_mb > 25:
+        raise RuntimeError("MAX_OUTPUT_MB must be between 1 and 25.")
 
     return Settings(
         token=token,
@@ -124,6 +128,7 @@ def load_settings() -> Settings:
         decontaminate=env_bool("BG_DECONTAMINATE", True),
         max_image_mb=max_mb,
         max_image_pixels=max_pixels,
+        max_output_mb=max_output_mb,
         upload_timeout_seconds=env_int("UPLOAD_TIMEOUT_SECONDS", 120),
         process_timeout_seconds=env_int("PROCESS_TIMEOUT_SECONDS", 300),
         accent_color=env_int("ACCENT_COLOR", 0x7C3AED),
