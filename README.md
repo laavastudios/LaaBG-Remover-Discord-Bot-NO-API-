@@ -13,7 +13,7 @@ A local-first Discord background-removal bot written entirely in Python.
 
 LaaBG uses **rembg** with a local ONNX model. No commercial background-removal API is used and uploaded images are not intentionally persisted by the bot.
 
-The default model is `birefnet-general`. rembg currently provides multiple local models including BiRefNet, U²-Net, IS-Net and portrait/anime variants. Models are downloaded locally on first use and reused through a persistent model directory. citeturn4search0turn6search6
+The default model is `birefnet-general`. rembg currently provides multiple local models including BiRefNet, U²-Net, IS-Net and portrait/anime variants. Models are downloaded locally on first use and reused through a persistent model directory.
 
 For a lighter machine, use:
 
@@ -29,7 +29,7 @@ BG_MODEL=birefnet-portrait
 
 ## Install
 
-Python 3.11–3.13 is supported by current rembg releases. citeturn5search0
+Python 3.11–3.13 is supported by current rembg releases.
 
 ### Windows
 
@@ -57,7 +57,7 @@ Then set `DISCORD_TOKEN` in `.env` and run:
 python bot.py
 ```
 
-The `rembg[cpu]` extra installs the CPU ONNX Runtime backend explicitly, avoiding the common “no ONNX runtime backend” setup problem. citeturn5search1
+The `rembg[cpu]` extra installs the CPU ONNX Runtime backend explicitly, avoiding the common “no ONNX runtime backend” setup problem.
 
 ## Discord permissions
 
@@ -84,11 +84,11 @@ An alias can be:
 
 The resolver checks the current guild first, then application-owned emojis, then uses a Unicode fallback.
 
-The bot fetches application emojis at startup using discord.py's application-emoji API. citeturn1search2
+The bot fetches application emojis at startup using discord.py's application-emoji API.
 
 ## Components V2
 
-The UI uses discord.py's `LayoutView`, `Container`, `TextDisplay`, `Separator`, and `ActionRow`. These are Discord V2 layout components supported by discord.py 2.6+. citeturn1search4
+The UI uses discord.py's `LayoutView`, `Container`, `TextDisplay`, `Separator`, and `ActionRow`. These are Discord V2 layout components supported by discord.py 2.6+.
 
 ## Security / reliability
 
@@ -105,7 +105,7 @@ The UI uses discord.py's `LayoutView`, `Container`, `TextDisplay`, `Separator`, 
 
 ## Model licensing
 
-The bot's code and rembg are separate from individual model-weight licenses. Do not assume every available model has the same license. In particular, rembg documents a separate BRIA license restriction for `bria-rmbg`, so this project intentionally does **not** use that model by default. Check the specific model license before commercial redistribution. citeturn3search2
+The bot's code and rembg are separate from individual model-weight licenses. Do not assume every available model has the same license. In particular, rembg documents a separate BRIA license restriction for `bria-rmbg`, so this project intentionally does **not** use that model by default. Check the specific model license before commercial redistribution.
 
 ## Project
 
