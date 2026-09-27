@@ -98,10 +98,28 @@ def _remove_sync(data: bytes, settings: Settings) -> bytes:
         raise ImageProcessingError("The model returned an empty image.")
 
     # Verify that the model really returned a valid PNG before Discord sees it.
-    with Image.open(io.BytesIO(output)) as image:
-        if image.format != "PNG":
-            raise ImageProcessingError("The processor did not return a PNG.")
-        image.verify()
+    try:
+        with Image.open(io.BytesIO(output)) as image:
+            if image.format != "PNG":
+                raise ImageProcessingError("The processor did not return a PNG.")
+            image.verify()
+
+        # Re-encode with PNG optimization so Discord uploads stay reasonably small.
+        with Image.open(io.BytesIO(output)) as image:
+            optimized = io.BytesIO()
+            image.save(optimized, format="PNG", optimize=True)
+            output = optimized.getvalue()
+    except ImageProcessingError:
+        raise
+    except (OSError, ValueError) as exc:
+        raise ImageProcessingError("The processor returned an invalid PNG.") from exc
+
+    max_output = settings.max_output_mb * 1024 * 1024
+    if len(output) > max_output:
+        raise ImageProcessingError(
+            f"The processed PNG is too large for Discord's default upload limit. "
+            f"Try a smaller input image (maximum output target: {settings.max_output_mb} MB)."
+        )
 
     return bytes(output)
 
