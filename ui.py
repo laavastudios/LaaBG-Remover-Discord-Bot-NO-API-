@@ -102,7 +102,7 @@ def help_view(settings, guild=None):
         ),
         discord.ui.Separator(),
         discord.ui.TextDisplay(
-            f"{e.success} U²-Net local inference  •  PNG output  •  no removal API"
+            f"{e.success} Local ONNX inference  •  PNG output  •  no removal API"
         ),
         view.links(),
     )
@@ -126,7 +126,7 @@ def about_view(settings, guild=None):
         ),
         discord.ui.TextDisplay(
             f"{e.image} **Local processing**\n"
-            "The image is processed by the bot's local U²-Net pipeline. "
+            "The image is processed by the bot's local segmentation pipeline. "
             "No commercial background-removal API is required."
         ),
         discord.ui.Separator(),
